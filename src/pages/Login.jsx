@@ -15,7 +15,8 @@ export default function Login() {
         if(getUser){
             navigate('/')
         }
-    }, [])
+        
+    }, [getUser])
 
     // async function googleLogin() {
     //     const { data, error } = await supabase.auth.signInWithOAuth({

@@ -4,6 +4,7 @@ import { supabase } from '../functions/supabaseConnect';
 import { authMiddleware } from '../functions/authMiddleware';
 import { useNavigate } from 'react-router-dom';
 import { UserContext, UserProvider, useUser, useUserUpdate } from "../context/UserContext"
+import LogoutUser from '../components/LogoutUser';
 export default function Home () {
     const getUser = useUser()
     const updateUser = useUserUpdate()
@@ -43,7 +44,10 @@ export default function Home () {
     return (
       <div>
         {getUser && (
-          <li>{full_name}</li>
+          <>
+          <h1>{full_name}</h1>
+          <LogoutUser />
+          </>
         )}
         
     </div>

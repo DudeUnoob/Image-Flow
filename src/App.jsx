@@ -10,7 +10,7 @@ import NavigationBar from './components/NavigationBar';
 import Dashboard from './pages/Dashboard';
 import Test from './pages/Test';
 import { UserProvider } from './context/UserContext';
-
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [count, setCount] = useState(0)
