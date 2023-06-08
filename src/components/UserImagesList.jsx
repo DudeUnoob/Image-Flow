@@ -32,7 +32,7 @@ export default function UserImageList({ imageList, user }) {
       });
     }
 
-    if (imageList.length > 0 && id) {
+    if (imageList && imageList.length > 0 && id) {
       downloadAndProcessImages();
     }
   }, [user, imageList, id]);
