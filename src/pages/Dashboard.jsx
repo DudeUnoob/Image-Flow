@@ -11,7 +11,7 @@ import { ToastContainer, toast } from "react-toastify"
 import { Text, Image, SimpleGrid } from '@mantine/core';
 import { Dropzone, IMAGE_MIME_TYPE, } from '@mantine/dropzone';
 import DropzoneComponentWrapper from "../components/DropzoneComponentWrapper"
-import * as tus from "tus-js-client"
+import UserImageList from "../components/UserImagesList"
 
 
 
@@ -23,6 +23,8 @@ export default function Dashboard() {
     const fileInputRef = useRef(null)
     const handleClose = () => setShow(false)
     const handleShow = () => setShow(true)
+    const [userImageFiles, setUserImageFiles] = useState([])
+
 
     useEffect(() => {
 
@@ -33,13 +35,20 @@ export default function Dashboard() {
             } else {
                 setUserData(data)
 
+
+
                 async function createBucket() {
-                     await supabase.storage.from("files").list(`${data.id}`).then((k) => console.log(k))
-                    
+
+
+
+
                     if (data && data.id) { // Add null check for userData and userData.id
                         const { re, error } = await supabase.storage.from('files').upload(`${data.id}/*.txt`, '')
 
                         const { reBack, err } = await supabase.storage.from('files').remove([`${data.id}/*.txt`])
+                        setUserImageFiles((await supabase.storage.from("files").list(data.id)).data)
+                        
+
 
                         if (err) {
                             toast.error('Looks like there\'s a duplicate file for this resource!', {
@@ -135,11 +144,14 @@ export default function Dashboard() {
 
     }
 
-    
+
 
     return (
         <>
             <div>
+                <div className="image-list">
+                    <UserImageList imageList={userImageFiles} user={userData} />
+                </div>
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>Upload Images</Modal.Title>
@@ -189,7 +201,6 @@ export default function Dashboard() {
                 pauseOnHover
                 theme="light"
             />
-            {/* Same as */}
             <ToastContainer />
         </>
     )
