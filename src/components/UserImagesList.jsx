@@ -69,7 +69,7 @@ export default function UserImageList({ imageList, user }) {
         )}
 
         <div className="image_list" ref={testRef}>
-          {imageList.length == 0 ? <h2 style={{textAlign:'center'}}>No Images - Add some! 📸</h2> : <p>Bye</p>}
+          {imageList.length == 0 ? <h2 style={{textAlign:'center', color:"#979797"}}>No Images - Add some! 📸</h2> : <p>Bye</p>}
           <ImageList variant="masonry" cols={4} gap={8} >
             {updatedImgUrls.map((url, index) => (
               <ImageListItem key={index}>
