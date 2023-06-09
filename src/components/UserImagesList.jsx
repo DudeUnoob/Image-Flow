@@ -1,10 +1,11 @@
-import { ImageList, ImageListItem, Paper, Typography } from '@mui/material';
+import { CircularProgress, ImageList, ImageListItem, Paper, Skeleton, Typography } from '@mui/material';
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../functions/supabaseConnect';
 import "../styles/css/UserImagesList.css"
 
 export default function UserImageList({ imageList, user }) {
   const [updatedImgUrls, setUpdatedImgUrls] = useState([]);
+  const [imagesLoaded, setImagesLoaded] = useState(false)
   const testRef = useRef(null);
   const id = user?.id;
 
@@ -30,6 +31,7 @@ export default function UserImageList({ imageList, user }) {
       ).then((imgURLs) => {
         const filteredURLs = imgURLs.filter((url) => url !== null);
         setUpdatedImgUrls(filteredURLs);
+        setImagesLoaded(true)
       });
     }
 
@@ -40,22 +42,37 @@ export default function UserImageList({ imageList, user }) {
 
   return (
     <>
-    <div className="heading">
-      <h1>Image Gallery</h1>
-    </div>
-    <Paper elevation={3} sx={{ padding: "20px", margin: "0 auto", borderRadius: "15px", width: "80%", cursor:"pointer", marginTop:"20px" }}>
+      <div className="heading">
+        <h1>Image Gallery</h1>
+      </div>
+      <Paper elevation={3} sx={{ padding: "20px", margin: "0 auto", borderRadius: "15px", width: "80%", cursor: "pointer", marginTop: "20px" }}>
+        <div className="skeleton-container" style={{ display: "flex", gap: "50px", margin: "0 auto", justifyContent: "space-evenly", alignItems: 'center' }}>
+          {!imagesLoaded && (
+            <>
+              <Skeleton height={225} width={300} animation={"wave"} />
+              <Skeleton height={225} width={300} animation={"wave"} />
+              <Skeleton height={225} width={300} animation={"wave"} />
 
-   
-    <div className="image_list" ref={testRef}>
-      <ImageList variant="masonry" cols={4} gap={8} >
-        {updatedImgUrls.map((url, index) => (
-          <ImageListItem key={index}>
-            <img src={url} srcSet={url} loading='lazy' id="file_images"/>
-          </ImageListItem>
-        ))}
-      </ImageList>
-    </div> 
-    </Paper>
+
+            </>
+          )}
+        </div>
+        {!imagesLoaded && (
+          <div className="circular-progress" style={{ justifyContent:"center", margin:"0 auto", display:'flex'}}>
+          <CircularProgress />
+          </div>
+        )}
+
+        <div className="image_list" ref={testRef}>
+          <ImageList variant="masonry" cols={4} gap={8} >
+            {updatedImgUrls.map((url, index) => (
+              <ImageListItem key={index}>
+                <img src={url} srcSet={url} loading='lazy' id="file_images" />
+              </ImageListItem>
+            ))}
+          </ImageList>
+        </div>
+      </Paper>
     </>
   );
 }
