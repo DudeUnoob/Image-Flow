@@ -1,6 +1,7 @@
-import { ImageList, ImageListItem } from '@mui/material';
+import { ImageList, ImageListItem, Paper, Typography } from '@mui/material';
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../functions/supabaseConnect';
+import "../styles/css/UserImagesList.css"
 
 export default function UserImageList({ imageList, user }) {
   const [updatedImgUrls, setUpdatedImgUrls] = useState([]);
@@ -38,14 +39,23 @@ export default function UserImageList({ imageList, user }) {
   }, [user, imageList, id]);
 
   return (
+    <>
+    <div className="heading">
+      <h1>Image Gallery</h1>
+    </div>
+    <Paper elevation={3} sx={{ padding: "20px", margin: "0 auto", borderRadius: "15px", width: "80%", cursor:"pointer", marginTop:"20px" }}>
+
+   
     <div className="image_list" ref={testRef}>
-      <ImageList variant="masonry" cols={3} gap={8}>
+      <ImageList variant="masonry" cols={4} gap={8} >
         {updatedImgUrls.map((url, index) => (
           <ImageListItem key={index}>
-            <img src={url} srcSet={url} loading="lazy" />
+            <img src={url} srcSet={url} loading='lazy' id="file_images"/>
           </ImageListItem>
         ))}
       </ImageList>
-    </div>
+    </div> 
+    </Paper>
+    </>
   );
 }

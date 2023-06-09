@@ -1,0 +1,14 @@
+
+#file_images {
+    
+}
+
+.image_list {
+   max-width: 100%;
+   margin: 0 auto;
+   cursor: pointer;
+}
+
+.heading {
+    text-align: center;
+}
