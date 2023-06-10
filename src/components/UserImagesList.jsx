@@ -2,21 +2,35 @@ import { CircularProgress, ImageList, ImageListItem, Paper, Skeleton, Typography
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../functions/supabaseConnect';
 import "../styles/css/UserImagesList.css"
+import { Menu } from '@mantine/core';
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera"
+import { DeleteOutline } from '@mui/icons-material';
+import { Modal, Button } from 'react-bootstrap';
+
 
 export default function UserImageList({ imageList, user }) {
   const [updatedImgUrls, setUpdatedImgUrls] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [show, setShow] = useState(false)
+  const [selectedDelImg, setSelectedDelImg] = useState({})
   const [areImagesLoaded, setAreImagesLoaded] = useState(false);
+  const [imagesLen, setImagesLen] = useState()
   const testRef = useRef(null);
   const id = user?.id;
-  
+
+  const [deletedImageIndex, setDeletedImageIndex] = useState(-1);
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
+
+  const handleModalState = () => setShow(currentShowState => !currentShowState);
+
   useEffect(() => {
     if (imageList.length === 0) {
       setUpdatedImgUrls([]);
       setIsLoading(false);
+      setImagesLen("no images")
       return;
     }
-
+    
     async function downloadAndProcessImages() {
       setIsLoading(true);
       setAreImagesLoaded(false);
@@ -50,6 +64,36 @@ export default function UserImageList({ imageList, user }) {
     }
   }, [user, imageList, id]);
 
+  const handleDeleteImage = (image, index) => {
+    handleModalState();
+    setSelectedDelImg(image);
+    setDeletedImageIndex(index);
+    setDeleteConfirmation(false);
+  };
+
+  useEffect(() => {
+    async function executeDeleteImage() {
+      if (deletedImageIndex !== -1 && deleteConfirmation) {
+        const deletedImageUrl = updatedImgUrls[deletedImageIndex];
+        // Delete the associated image using the deletedImageUrl or any necessary logic
+        // You can access the deleted image's data from selectedDelImg state if needed
+        // ...
+        
+        // After deleting the image, update the state to reflect the changes
+        const updatedUrls = [...updatedImgUrls];
+        updatedUrls.splice(deletedImageIndex, 1);
+        setUpdatedImgUrls(updatedUrls);
+        setDeletedImageIndex(-1);
+        setDeleteConfirmation(false);
+        handleModalState()
+        const { data, error } = await supabase.storage.from("files").remove([`${id}/${selectedDelImg.name}`]) 
+      }
+    }
+
+    executeDeleteImage()
+   
+  }, [deletedImageIndex, updatedImgUrls, deleteConfirmation]);
+
   return (
     <>
       <div className="heading">
@@ -65,11 +109,11 @@ export default function UserImageList({ imageList, user }) {
             </>
           ) : null}
         </div>
-        {isLoading && (
+        {isLoading || !areImagesLoaded ? (
           <div className="circular-progress" style={{ justifyContent: "center", margin: "0 auto", display: 'flex' }}>
             <CircularProgress />
           </div>
-        )}
+        ) : null}
 
         <div className="image_list" ref={testRef}>
           {imageList.length === "no images" ? (
@@ -77,14 +121,45 @@ export default function UserImageList({ imageList, user }) {
           ) : (
             <ImageList variant="masonry" cols={4} gap={8}>
               {updatedImgUrls.map((url, index) => (
-                <ImageListItem key={index}>
-                  <img src={url} srcSet={url} loading='lazy' id="file_images" />
-                </ImageListItem>
+                <Menu key={index} trigger='hover'>
+                  <Menu.Target>
+                    <ImageListItem>
+                      <img src={url} srcSet={url} loading='lazy' id="file_images" key={index} />
+                    </ImageListItem>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Label>Image</Menu.Label>
+                    <Menu.Item icon={<PhotoCameraIcon sx={{ fontSize: 15 }} />}>{imageList[index + 1].name}</Menu.Item>
+                    <Menu.Item>Added: {new Date(imageList[index + 1].created_at).toLocaleDateString("en-US")}</Menu.Item>
+                    <Menu.Divider />
+                    <Menu.Label>Danger Zone</Menu.Label>
+                    <Menu.Item
+                      color='red'
+                      icon={<DeleteOutline sx={{ fontSize: 18 }} />}
+                      onClick={() => handleDeleteImage(imageList[index + 1], index)}
+                    >
+                      Delete Image
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
               ))}
             </ImageList>
           )}
         </div>
       </Paper>
+
+      <Modal show={show} onHide={handleModalState}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Image</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete <b>{selectedDelImg.name}?</b>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant='primary' onClick={handleModalState}>Close</Button>
+          <Button variant='danger' onClick={() => setDeleteConfirmation(true)}>Delete</Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

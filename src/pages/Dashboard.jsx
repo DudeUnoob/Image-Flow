@@ -20,7 +20,11 @@ export default function Dashboard() {
   const handleShow = () => setShow(true);
   const [userImageFiles, setUserImageFiles] = useState([]);
 
+  
+  
+
   useEffect(() => {
+   
     authMiddleware().then((data) => {
       if (data == null) {
         navigate("/login");
@@ -62,6 +66,8 @@ export default function Dashboard() {
         createBucket();
       }
     });
+    
+    
   }, []);
 
   const previews = files.map((file, index) => {
@@ -135,13 +141,14 @@ export default function Dashboard() {
 
     setFiles([]);
     handleClose(); 
+    
   };
 
   return (
     <>
       <div>
         <div className="image-list">
-          <UserImageList imageList={userImageFiles} user={userData} />
+          <UserImageList imageList={userImageFiles} user={userData}  />
         </div>
         <Modal show={show} onHide={handleClose}>
           <Modal.Header closeButton>

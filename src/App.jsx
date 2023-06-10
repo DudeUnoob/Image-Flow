@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -11,9 +11,14 @@ import Dashboard from './pages/Dashboard';
 import Test from './pages/Test';
 import { UserProvider } from './context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
+import { onLocalStorageChange } from './functions/onLocalStorageChange';
 
 function App() {
   const [count, setCount] = useState(0)
+
+   useEffect(() => {
+    onLocalStorageChange()
+   },[])
 
   return (
     
